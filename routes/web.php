@@ -16,22 +16,34 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\Route;
 
+/**
+ * {
+"T:CA" : {
+"market_capitalization" : 10,
+"outstanding_share": 10,
+"revenue": [],
+"operating_cash_flow": [],
+"capital_expenditure": [],
+"earnings" : []
+}
+}
+ */
 
 Route::get('raw/{ticker}', function (\Illuminate\Http\Request $request) {
     $companyName = $request->route('ticker');
 
     $requestBody = \GuzzleHttp\json_encode([
-        'data' => [
-            $companyName =>
-                [
-                    'revenue' => sprintf('QFS(%s,revenue,FY-19:FY)', $companyName)
-                ]
-        ]
+//        'data' => [
+//            $companyName =>
+//                [
+//                    'revenue' => sprintf('QFS(%s,revenue,FY-19:FY)', $companyName)
+//                ]
+//        ]
     ]);
 
     $request = new Request(
-        'POST',
-        '/v1/data/batch',
+        'GET',
+        '/v1/metrics',
         [
             config('quickfs.auth-header') => config('quickfs.api-key'),
             'Content-Type' => 'application/json',
@@ -46,6 +58,7 @@ Route::get('raw/{ticker}', function (\Illuminate\Http\Request $request) {
     try {
         $response = $client->send($request);
 
+        dd($response->getBody()->getContents());
         return $response->getBody()->getContents();
     } catch (RequestException $exception) {
         return $exception->getResponse();
