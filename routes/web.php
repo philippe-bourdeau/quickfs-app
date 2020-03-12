@@ -32,6 +32,8 @@ use Illuminate\Support\Facades\Route;
 //const NET_INCOME = 'net_income';
 //const REVENUE = 'revenue';
 
+Route::get('cool', fn() => 'cool');
+
 Route::get('raw/{ticker}', function (\Illuminate\Http\Request $request) {
     $ticker = $request->route('ticker');
 
