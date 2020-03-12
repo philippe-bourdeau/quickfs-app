@@ -14,6 +14,7 @@
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -32,7 +33,9 @@ use Illuminate\Support\Facades\Route;
 //const NET_INCOME = 'net_income';
 //const REVENUE = 'revenue';
 
-Route::get('cool', fn() => 'cool');
+Route::get('cool', function () {
+    Log::debug('An informational message.');
+});
 
 Route::get('raw/{ticker}', function (\Illuminate\Http\Request $request) {
     $ticker = $request->route('ticker');
