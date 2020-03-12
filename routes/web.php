@@ -43,6 +43,7 @@ Route::get('raw/{ticker}', function (\Illuminate\Http\Request $request) {
                 'operating_cash_flow' => sprintf('QFS(%s,cf_cfo,FY-9:FY)', $ticker),
                 'capex' => sprintf('QFS(%s,capex,FY-9:FY)', $ticker),
                 'net_income' => sprintf('QFS(%s,net_income,FY-9:FY)', $ticker),
+                'equity' => sprintf('QFS(%s,total_equity,FY-9:FY)', $ticker),
             ]
         ]
     );
@@ -77,12 +78,15 @@ Route::get('raw/{ticker}', function (\Illuminate\Http\Request $request) {
             'ticker' => $ticker,
             'year' => array_pop($data->period_end_date),
             'cash_flow_statement' => [
-                'revenue' => array_pop($data->revenue),
                 'operating_cash_flow' => array_pop($data->operating_cash_flow),
                 'capex' => array_pop($data->capex)
             ],
             'income_statement' => [
+                'revenue' => array_pop($data->revenue),
                 'net_income' => array_pop($data->net_income)
+            ],
+            'balance_sheet' => [
+                'equity' => array_pop($data->equity)
             ]
         ];
 
