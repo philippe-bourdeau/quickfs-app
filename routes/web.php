@@ -15,6 +15,7 @@ use App\Business\Clients\IQuickFSClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 /**
  * {
@@ -37,7 +38,12 @@ Route::get('cool', function () {
 });
 
 Route::get('raw/{ticker}', function (Request $request) {
-    $ticker = $request->route('ticker');
+    $ticker = trim(Str::upper($request->route('ticker')));
+
+    $redisEntry = \Illuminate\Support\Facades\Redis::get($ticker);
+    if ($redisEntry) {
+        return $redisEntry;
+    }
 
     $body =[
             'data' => [
@@ -88,6 +94,13 @@ Route::get('raw/{ticker}', function (Request $request) {
         ],
         'statements' => $statements->all()
     ];
+
+    \Illuminate\Support\Facades\Redis::set(
+        $ticker,
+        GuzzleHttp\json_encode($data),
+        'EX',
+        60 * 60 * 24
+    );
 
     return \GuzzleHttp\json_encode($data);
 });
