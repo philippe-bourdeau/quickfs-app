@@ -9,6 +9,18 @@ use Illuminate\Support\Str;
 class QuickFSController extends Controller
 {
     /**
+     * @var IQuickFSClient
+     */
+    private IQuickFSClient $client;
+
+    public function __construct(IQuickFSClient $client)
+    {
+        $this->client = $client;
+        $this->middleware('ticker');
+    }
+
+
+    /**
      * @param StatementsReadRequest $request
      * @return string
      */
@@ -16,12 +28,20 @@ class QuickFSController extends Controller
     {
         $ticker = Str::upper($request->route('ticker'));
 
-        $redisEntry = \Illuminate\Support\Facades\Redis::get($ticker);
-        if ($redisEntry) {
-            return $redisEntry;
-        }
+//        $redisEntry = \Illuminate\Support\Facades\Redis::get($ticker);
+//        if ($redisEntry) {
+//            return $redisEntry;
+//        }
 
-        $body =[
+        $response = $this->client->batchRequest([
+            'data' => [
+                'price' => sprintf('QFS(%s,price)', $ticker)
+            ]
+        ]);
+
+
+
+        $body = [
             'data' => [
                 'period_end_date' => sprintf('QFS(%s,period_end_date,FY-9:FY)', $ticker),
                 'revenue' => sprintf('QFS(%s,revenue,FY-9:FY)', $ticker),
@@ -30,7 +50,7 @@ class QuickFSController extends Controller
                 'net_income' => sprintf('QFS(%s,net_income,FY-9:FY)', $ticker),
                 'equity' => sprintf('QFS(%s,total_equity,FY-9:FY)', $ticker),
                 'eps' => sprintf('QFS(%s,eps_diluted,FY-9:FY)', $ticker),
-                'price' =>sprintf('QFS(%s,price)', $ticker),
+                'price' => sprintf('QFS(%s,price)', $ticker),
                 'market_cap' => sprintf('QFS(%s,mkt_cap)', $ticker)
             ]
         ];
@@ -42,7 +62,7 @@ class QuickFSController extends Controller
         $data = $responseBody->data;
 
         $statements = collect();
-        for ($i= 0; $i<10;$i++ ) {
+        for ($i = 0; $i < 10; $i++) {
             $container = [
                 'fiscal_end_date' => array_pop($data->period_end_date),
                 'cash_flow_statement' => [

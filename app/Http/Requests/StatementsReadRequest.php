@@ -28,7 +28,7 @@ class StatementsReadRequest extends FormRequest
                 'required',
                 'regex:/^[a-z0-9]+\.?[a-z0-9]*:[a-z]{2}$/i',
                 'max:256',
-                'ends_with:US,CA,MX,UK,AU'
+                'ends_with:US,CA,MX,UK,AU,NZ'
             ]
         ];
     }

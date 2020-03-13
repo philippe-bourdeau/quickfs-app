@@ -11,7 +11,6 @@
 |
 */
 
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -30,8 +29,10 @@ use Illuminate\Support\Facades\Route;
 //const NET_INCOME = 'net_income';
 //const REVENUE = 'revenue';
 
-Route::get('cool', function () {
-    Log::debug('An informational message.');
-});
+//Route::get('cool', function () {
+//    Log::debug('An informational message.');
+//
+//    return 'cool';
+//});
 
 Route::get('query', 'QuickFSController@queryStatements');
