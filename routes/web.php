@@ -11,9 +11,8 @@
 |
 */
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7\Request;
+use App\Business\Clients\IQuickFSClient;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
@@ -37,11 +36,10 @@ Route::get('cool', function () {
     Log::debug('An informational message.');
 });
 
-Route::get('raw/{ticker}', function (\Illuminate\Http\Request $request) {
+Route::get('raw/{ticker}', function (Request $request) {
     $ticker = $request->route('ticker');
 
-    $requestBody = \GuzzleHttp\json_encode(
-        [
+    $body =[
             'data' => [
                 'period_end_date' => sprintf('QFS(%s,period_end_date,FY-9:FY)', $ticker),
                 'revenue' => sprintf('QFS(%s,revenue,FY-9:FY)', $ticker),
@@ -53,32 +51,13 @@ Route::get('raw/{ticker}', function (\Illuminate\Http\Request $request) {
                 'price' =>sprintf('QFS(%s,price)', $ticker),
                 'market_cap' => sprintf('QFS(%s,mkt_cap)', $ticker)
             ]
-        ]
-    );
+        ];
 
-    $request = new Request(
-        'POST',
-        '/v1/data/batch',
-        [
-            config('quickfs.auth-header') => config('quickfs.api-key'),
-            'Content-Type' => 'application/json',
-        ],
-        $requestBody
-    );
-
-    $client = new Client([
-        'base_uri' => config('quickfs.base-uri'),
-    ]);
-
-    try {
-        $response = $client->send($request);
-        $contents = $response->getBody()->getContents();
-    } catch (RequestException $exception) {
-        return $exception->getResponse();
-    }
-
-    $object = \GuzzleHttp\json_decode($contents);
-    $data = $object->data;
+    /** @var IQuickFSClient $client */
+    $client = app(IQuickFSClient::class);
+    $response = $client->batchRequest($body);
+    $responseBody = \GuzzleHttp\json_decode($response->getBody()->getContents());
+    $data = $responseBody->data;
 
     $statements = collect();
     for ($i= 0; $i<10;$i++ ) {
@@ -111,5 +90,4 @@ Route::get('raw/{ticker}', function (\Illuminate\Http\Request $request) {
     ];
 
     return \GuzzleHttp\json_encode($data);
-
 });
