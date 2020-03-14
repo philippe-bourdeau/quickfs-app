@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\CacheStatementsMiddleware;
 use App\Http\Middleware\TweakTickerMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
@@ -63,7 +64,8 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'ticker' => TweakTickerMiddleware::class
+        'ticker' => TweakTickerMiddleware::class,
+        'cache_statements' => CacheStatementsMiddleware::class
     ];
 
     /**
@@ -81,5 +83,7 @@ class Kernel extends HttpKernel
         \Illuminate\Session\Middleware\AuthenticateSession::class,
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
         \Illuminate\Auth\Middleware\Authorize::class,
+        TweakTickerMiddleware::class,
+        CacheStatementsMiddleware::class
     ];
 }

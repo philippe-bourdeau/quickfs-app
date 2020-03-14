@@ -60,6 +60,4 @@ class QuickFSClient implements IQuickFSClient
             ]
         );
     }
-
-
 }

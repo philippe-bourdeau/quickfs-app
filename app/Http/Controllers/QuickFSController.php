@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Business\Clients\IQuickFSClient;
 use App\Http\Requests\StatementsReadRequest;
-use Illuminate\Support\Str;
 
 class QuickFSController extends Controller
 {
@@ -17,6 +16,7 @@ class QuickFSController extends Controller
     {
         $this->client = $client;
         $this->middleware('ticker');
+        $this->middleware('cache_statements');
     }
 
 
@@ -26,19 +26,7 @@ class QuickFSController extends Controller
      */
     public function queryStatements(StatementsReadRequest $request)
     {
-        $ticker = Str::upper($request->route('ticker'));
-
-//        $redisEntry = \Illuminate\Support\Facades\Redis::get($ticker);
-//        if ($redisEntry) {
-//            return $redisEntry;
-//        }
-
-        $response = $this->client->multipleMetrics([
-            'data' => [
-                'price' => sprintf('QFS(%s,price)', $ticker)
-            ]
-        ]);
-
+        $ticker = $request->get('ticker');
 
         $body = [
             'data' => [
@@ -54,9 +42,7 @@ class QuickFSController extends Controller
             ]
         ];
 
-        /** @var IQuickFSClient $client */
-        $client = app(IQuickFSClient::class);
-        $response = $client->multipleMetrics($body);
+        $response = $this->client->multipleMetrics($body);
         $responseBody = \GuzzleHttp\json_decode($response->getBody()->getContents());
         $data = $responseBody->data;
 
@@ -89,13 +75,6 @@ class QuickFSController extends Controller
             ],
             'statements' => $statements->all()
         ];
-
-        \Illuminate\Support\Facades\Redis::set(
-            $ticker,
-            \GuzzleHttp\json_encode($data),
-            'EX',
-            60 * 60 * 24
-        );
 
         return \GuzzleHttp\json_encode($data);
     }
