@@ -20,16 +20,14 @@ class CacheStatementsMiddleware
 
         $cachedEntry = \Illuminate\Support\Facades\Redis::get($ticker);
         if ($cachedEntry) {
-            return new JsonResponse(
-                \GuzzleHttp\json_decode($cachedEntry)
-            );
+            return new JsonResponse(\GuzzleHttp\json_decode($cachedEntry));
         }
 
         $response = $next($request);
 
         \Illuminate\Support\Facades\Redis::set(
             $request->get('ticker'),
-            \GuzzleHttp\json_encode($response->getContent()),
+            $response->getContent(),
             'EX',
             60 * 60 * 24
         );

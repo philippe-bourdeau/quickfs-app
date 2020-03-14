@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Business\Clients\IQuickFSClient;
 use App\Http\Requests\StatementsReadRequest;
+use Illuminate\Http\JsonResponse;
 
 class QuickFSController extends Controller
 {
@@ -76,6 +77,6 @@ class QuickFSController extends Controller
             'statements' => $statements->all()
         ];
 
-        return \GuzzleHttp\json_encode($data);
+        return new JsonResponse($data);
     }
 }
