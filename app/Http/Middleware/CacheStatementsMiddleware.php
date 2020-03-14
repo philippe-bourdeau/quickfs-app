@@ -25,6 +25,11 @@ class CacheStatementsMiddleware
 
         $response = $next($request);
 
+        /** @var $response JsonResponse */
+        if ($response->getStatusCode() >= 400) {
+            return $response;
+        }
+
         \Illuminate\Support\Facades\Redis::set(
             $request->get('ticker'),
             $response->getContent(),
