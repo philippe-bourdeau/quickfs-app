@@ -12,5 +12,7 @@ interface IQuickFSClient
      * @param array $body
      * @return ResponseInterface
      */
-    public function batchRequest(array $body): ResponseInterface;
+    public function multipleMetrics(array $body): ResponseInterface;
+
+    public function singleMetric(string $ticker, string $metric, string $period): ResponseInterface;
 }

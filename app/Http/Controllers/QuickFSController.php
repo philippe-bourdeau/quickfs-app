@@ -33,12 +33,11 @@ class QuickFSController extends Controller
 //            return $redisEntry;
 //        }
 
-        $response = $this->client->batchRequest([
+        $response = $this->client->multipleMetrics([
             'data' => [
                 'price' => sprintf('QFS(%s,price)', $ticker)
             ]
         ]);
-
 
 
         $body = [
@@ -57,7 +56,7 @@ class QuickFSController extends Controller
 
         /** @var IQuickFSClient $client */
         $client = app(IQuickFSClient::class);
-        $response = $client->batchRequest($body);
+        $response = $client->multipleMetrics($body);
         $responseBody = \GuzzleHttp\json_decode($response->getBody()->getContents());
         $data = $responseBody->data;
 

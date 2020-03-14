@@ -5,8 +5,6 @@ namespace App\Business\Clients;
 
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
 
@@ -33,19 +31,35 @@ class QuickFSClient implements IQuickFSClient
      * @param array $body
      * @return ResponseInterface
      */
-    public function batchRequest(array $body): ResponseInterface
+    public function multipleMetrics(array $body): ResponseInterface
     {
-        $request = new Request(
+        return $this->client->request(
             'POST',
             'v1/data/batch',
-            [],
-            \GuzzleHttp\json_encode($body)
+            [
+                RequestOptions::BODY => \GuzzleHttp\json_encode($body)
+            ]
         );
-
-        try {
-            return $this->client->send($request);
-        } catch (RequestException $exception) {
-            return $exception->getResponse();
-        }
     }
+
+    /**
+     * @param string $ticker
+     * @param string $metric
+     * @param string $period
+     * @return ResponseInterface
+     */
+    public function singleMetric(string $ticker, string $metric, string $period): ResponseInterface
+    {
+        return $this->client->request(
+            'GET',
+            sprintf('v1/data/%s/%s', $ticker, $metric),
+            [
+                RequestOptions::QUERY => [
+                    'period' =>  $period
+                ]
+            ]
+        );
+    }
+
+
 }
