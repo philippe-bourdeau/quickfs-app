@@ -26,12 +26,11 @@ class SupportedCompany implements Rule
         );
 
         $contents = \GuzzleHttp\json_decode($response->getBody()->getContents());
-
-        if ($contents->{'errors'}->{'error'} === 'UnsupportedCompanyError') {
-            return false;
+        if (!isset($contents->errors->error)) {
+            return true;
         }
 
-        return true;
+        return !($contents->errors->error === 'UnsupportedCompanyError');
     }
 
     /**
