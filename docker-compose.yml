@@ -2,10 +2,12 @@ version: '3.3'
 
 services:
   php-fpm:
+    container_name: quickfs-fpm
     build:
       context: ./docker/php-fpm
+    args:
+      - XDEBUG_ON=1
     restart: unless-stopped
-    container_name: quickfs-fpm
     volumes:
       - .:/var/www/html
   php-cli:
@@ -15,8 +17,10 @@ services:
     volumes:
       - .:/var/www/html
   nginx:
-    image: nginx:alpine
     container_name: quickfs-nginx
+    image: nginx:alpine
+    build:
+      context: ./docker/nginx
     restart: unless-stopped
     depends_on:
       - php-fpm
@@ -24,13 +28,13 @@ services:
       - 8080:80
       - 443:443
     volumes:
-      - ./nginx/site.conf:/etc/nginx/conf.d/site.conf
+      - ./docker/nginx/site.conf:/etc/nginx/conf.d/site.conf
       - .:/var/www/html
   redis:
-    image: redis:alpine
     container_name: quickfs-redis
+    image: redis:alpine
     restart: unless-stopped
     depends_on:
       - php-fpm
     volumes:
-      - /data
+      - /redis/data
