@@ -1,0 +1,36 @@
+version: '3.3'
+
+services:
+  php-fpm:
+    build:
+      context: ./docker/php-fpm
+    restart: unless-stopped
+    container_name: quickfs-fpm
+    volumes:
+      - .:/var/www/html
+  php-cli:
+    container_name: quickfs-cli
+    build:
+      context: ./docker/php-cli
+    volumes:
+      - .:/var/www/html
+  nginx:
+    image: nginx:alpine
+    container_name: quickfs-nginx
+    restart: unless-stopped
+    depends_on:
+      - php-fpm
+    ports:
+      - 8080:80
+      - 443:443
+    volumes:
+      - ./nginx/site.conf:/etc/nginx/conf.d/site.conf
+      - .:/var/www/html
+  redis:
+    image: redis:alpine
+    container_name: quickfs-redis
+    restart: unless-stopped
+    depends_on:
+      - php-fpm
+    volumes:
+      - /data
