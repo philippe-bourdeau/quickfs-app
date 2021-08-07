@@ -12,10 +12,11 @@ RUN pecl install redis
 RUN docker-php-ext-enable redis
 COPY redis.ini /usr/local/etc/php/conf.d/redis.ini
 
+ARG XDEBUG_ON
 COPY xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
 RUN if [ $XDEBUG_ON -eq 1 ]; then \
  pecl install xdebug \
- docker-php-ext-enable xdebug;
+ docker-php-ext-enable xdebug; \
  fi
 
 RUN apk del buildDeps

@@ -5,8 +5,8 @@ services:
     container_name: quickfs-fpm
     build:
       context: ./docker/php-fpm
-    args:
-      - XDEBUG_ON=1
+      args:
+        XDEBUG_ON: 1
     restart: unless-stopped
     volumes:
       - .:/var/www/html
