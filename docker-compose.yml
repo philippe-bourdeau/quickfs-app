@@ -19,8 +19,6 @@ services:
   nginx:
     container_name: quickfs-nginx
     image: nginx:alpine
-    build:
-      context: ./docker/nginx
     restart: unless-stopped
     depends_on:
       - php-fpm
